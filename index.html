@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#202124">
+<title>Google — Modo Oscuro</title>
+<style>
+:root{color-scheme:dark;--bg:#202124;--surface:#303134;--text:#e8eaed;--muted:#9aa0a6;--blue:#8ab4f8}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{min-height:100dvh;overflow-x:hidden}
+.status-bar{height:34px;padding:4px 14px 3px;background:#171719;color:#f4f4f5;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;letter-spacing:.1px}
+.status-left,.status-right{display:flex;align-items:center;gap:9px;white-space:nowrap}
+.status-time{font-size:15px;min-width:42px}
+.status-icon{display:inline-flex;align-items:center;justify-content:center;height:18px;min-width:13px}
+.battery{height:15px;min-width:34px;border:1.5px solid #e8eaed;border-radius:5px;position:relative;padding:0 4px;font-size:10px;line-height:12px;text-align:center;margin-left:1px}
+.battery:after{content:"";position:absolute;right:-4px;top:4px;width:2px;height:5px;background:#e8eaed;border-radius:0 2px 2px 0}
+
+/* Barra de navegación de Chrome */
+.browser-bar{position:sticky;top:0;z-index:10;height:56px;padding:8px 12px;background:#292a2d;display:flex;align-items:center;gap:12px;border-bottom:1px solid #3c4043}
+.browser-controls{display:flex;gap:16px;align-items:center;color:#bdc1c6}
+.address-bar{height:40px;border-radius:20px;background:#202124;display:flex;align-items:center;padding:0 14px;gap:10px;flex:1;min-width:0;color:#e8eaed;font-size:15px}
+.address-bar .url{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:400;letter-spacing:0.2px}
+.browser-menu{color:#bdc1c6;display:flex;align-items:center;gap:16px}
+.browser-menu .tabs{border:2px solid #bdc1c6;border-radius:6px;font-size:11px;font-weight:bold;padding:1px 4px;min-width:20px;text-align:center}
+
+.svg-top { width: 22px; height: 22px; fill: #bdc1c6; display: block; }
+.svg-icon { width: 20px; height: 20px; fill: #9aa0a6; display: inline-block; flex-shrink: 0; }
+.trend-arrow { width: 18px; height: 18px; fill: #9aa0a6; flex-shrink: 0; }
+
+main{width:100%;min-height:calc(100dvh - 90px);display:flex;flex-direction:column;align-items:center;padding:0 18px 32px}
+.home{width:100%;max-width:650px;display:flex;flex-direction:column;align-items:center;padding-top:clamp(16px,4vh,45px)}
+
+.top-bar-sub{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px;transition:opacity .2s}
+.top-left{display:flex;align-items:center;gap:16px;color:#bdc1c6}
+.top-right{display:flex;align-items:center;gap:12px}
+.signin-pill{background:#8ab4f8;color:#202124;padding:6px 16px;border-radius:20px;font-weight:600;font-size:13px;cursor:pointer}
+.sub-image-container{width:100%;margin-bottom:14px;padding-left:34px;font-size:13px}
+
+/* LOGOTIPO DE GOOGLE EN BLANCO */
+.logo{font-size:clamp(45px,11vw,68px);font-weight:400;letter-spacing:-2px;line-height:1.15;margin-bottom:18px;user-select:none;cursor:pointer;touch-action:manipulation;color:#e8eaed}
+
+/* CAJA DE BÚSQUEDA */
+.search-wrapper {
+  width: 100%;
+  max-width: 584px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #303134;
+  border-radius: 26px;
+  min-height: 48px;
+  padding: 0 16px;
+  margin-bottom: 12px;
+  transition: all .2s ease;
+}
+.back-arrow {
+  display: none;
+  font-size: 20px;
+  color: #bdc1c6;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.search-wrapper input {
+  flex: 1;
+  min-width: 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-size: 16px;
+  padding: 13px 0;
+}
+.search-wrapper input::placeholder { color: transparent; }
+.search-icons { display: flex; gap: 16px; align-items: center; }
+
+.hide-on-search { transition: opacity .2s ease; }
+
+.offered-langs{font-size:12px;color:#bdc1c6;margin-top:2px;margin-bottom:18px;text-align:center;cursor:pointer;user-select:none}
+.offered-langs span{color:#8ab4f8;text-decoration:underline;margin:0 2px}
+
+.trends-card{width:100%;max-width:584px;background:#202124;border:1px solid #3c4043;border-radius:12px;overflow:hidden;margin-top:4px}
+.trends-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;font-size:15px;border-bottom:1px solid #3c4043;cursor:pointer}
+.trend-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #292a2d;cursor:pointer;transition:background .1s}
+.trend-item:hover{background:#303134}
+.trend-content{display:flex;align-items:center;gap:14px;color:#bdc1c6;font-size:14px}
+.trend-sub{font-size:12px;color:#9aa0a6;margin-top:2px}
+.trend-thumb{width:36px;height:36px;border-radius:50%;object-fit:cover}
+
+/* FOOTER */
+.footer {
+  margin-top: auto;
+  width: 100%;
+  max-width: 584px;
+  padding: 30px 0 15px;
+  color: #9aa0a6;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.footer-country {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #3c4043;
+  color: #e8eaed;
+}
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  row-gap: 12px;
+  text-align: center;
+}
+.footer-row span { cursor: pointer; }
+.footer-row span:hover { text-decoration: underline; }
+
+#magicPanel{display:none;position:fixed;inset:0;z-index:100;background:#000d;padding:20px;overflow-y:auto;align-items:center;justify-content:center}
+.panel-card{width:100%;max-width:410px;padding:23px;border-radius:16px;background:#292a2d;border:1px solid #5f6368;box-shadow:0 10px 40px #0008}
+.panel-card h2{font-size:20px;margin:0 0 8px;color:#fff}
+.hint{font-size:13px;line-height:1.5;color:#bdc1c6;margin:0 0 15px}
+.panel-card label{display:block;font-size:13px;margin:12px 0 5px;color:#e8eaed}
+.panel-card input{display:block;width:100%;border:1px solid #5f6368;border-radius:7px;padding:10px;background:#202124;color:#fff;font-size:14px;outline:0}
+.panel-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.panel-actions button{border:0;border-radius:7px;padding:10px 12px;font-size:13px;cursor:pointer}
+.primary{background:#8ab4f8;color:#202124;font-weight:bold}.secondary{background:#3c4043;color:white}
+.panel-status{margin-top:10px;font-size:12px;line-height:1.4;color:#8ab4f8}
+.history-box{background:#202124;border:1px solid #3c4043;border-radius:8px;padding:10px;margin-top:12px;max-height:110px;overflow-y:auto}
+.history-title{font-size:12px;font-weight:bold;color:#9aa0a6;margin-bottom:6px}
+.history-item{font-size:12px;color:#e8eaed;padding:3px 0;border-bottom:1px solid #292a2d;display:flex;justify-content:space-between}
+.history-time{color:#9aa0a6;font-size:11px}
+</style>
+</head>
+<body>
+<div class="status-bar" aria-label="Barra de estado simulada">
+  <div class="status-left">
+    <span class="status-time" id="statusTime">22:12</span>
+    <span class="status-icon" aria-hidden="true">➤</span>
+    <span class="status-icon" aria-hidden="true">⬇</span>
+  </div>
+  <div class="status-right">
+    <span class="status-icon" aria-hidden="true">⚿</span>
+    <span class="status-icon" aria-hidden="true">◖</span>
+    <span class="battery" aria-label="Batería simulada">39</span>
+  </div>
+</div>
+
+<div class="browser-bar">
+  <div class="browser-controls" aria-hidden="true">
+    <svg class="svg-top" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+  </div>
+  <div class="address-bar">
+    <!-- ICONO OFICIAL DE CONTROLES DE SITIO (ECUALIZADOR CLÁSICO DE CHROME) -->
+    <svg style="width:18px;height:18px;fill:#bdc1c6;flex-shrink:0;" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+    <span class="url" id="addressUrl">google.com</span>
+  </div>
+  <div class="browser-menu">
+    <svg class="svg-top" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    <span class="tabs">23</span>
+    <svg class="svg-top" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+  </div>
+</div>
+
+<main>
+  <section class="home" id="home">
+    <div class="top-bar-sub hide-on-search" id="topSubBar">
+      <div class="top-left">
+        <span>☰</span>
+        <span style="color:#8ab4f8;border-bottom:3px solid #8ab4f8;padding-bottom:4px">TODO</span>
+      </div>
+      <div class="top-right">
+        <span>⠸</span>
+        <div class="signin-pill">Iniciar sesión</div>
+      </div>
+    </div>
+    <div class="sub-image-container hide-on-search" id="subImageBar">
+      <span style="color:#9aa0a6">IMÁGENES</span>
+    </div>
+
+    <!-- LOGOTIPO DE GOOGLE EN BLANCO -->
+    <div class="logo hide-on-search" id="mainLogo" aria-label="Google">
+      <span>Google</span>
+    </div>
+
+    <!-- CAJA DE BÚSQUEDA -->
+    <form id="searchForm" class="search-wrapper">
+      <button type="button" class="back-arrow" id="backBtn" aria-label="Volver">←</button>
+      <svg class="svg-icon" id="leftPlusIcon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      <input id="searchInput" type="text" autocomplete="off" aria-label="Buscar">
+      <div class="search-icons">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2-2zm8-10H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/></svg>
+      </div>
+    </form>
+
+    <div class="offered-langs hide-on-search" id="langsTrigger" title="Haz doble toque aquí para pantalla completa">
+      Ofrecido por Google en: <span>català</span> <span>galego</span> <span>euskara</span>
+    </div>
+
+    <!-- TENDENCIAS DE BÚSQUEDA -->
+    <div class="trends-card">
+      <div class="trends-header" id="trendsHeader" title="Haz doble toque aquí para pantalla completa">
+        <span>Tendencias de búsqueda</span>
+        <svg style="width:18px;height:18px;fill:#bdc1c6;" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      </div>
+      <div id="trendsListContainer">
+        <div class="trend-item" data-query="Cargando tendencias reales..."><div class="trend-content"><svg class="trend-arrow" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg> Cargando tendencias en tiempo real...</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer hide-on-search" id="footerArea">
+    <div class="footer-country">España</div>
+    <div class="footer-row">
+      <span>Tema oscuro: activado</span>
+      <span id="configTrigger" title="Haz doble toque aquí para abrir el panel">Configuración</span>
+      <span>Privacidad</span>
+    </div>
+    <div class="footer-row">
+      <span>Términos</span>
+    </div>
+    <div class="footer-row">
+      <span>Publicidad</span>
+      <span>Empresa</span>
+      <span>Sobre Google</span>
+    </div>
+  </footer>
+</main>
+
+<div id="magicPanel" role="dialog" aria-modal="true">
+  <div class="panel-card">
+    <h2>Panel del mago</h2>
+    <p class="hint">Configuración de notificaciones de Telegram y registro de consultas[span_0](start_span)[span_0](end_span).</p>
+    <label for="botToken">Telegram Bot Token</label><input id="botToken" type="password" placeholder="123456:ABC-DEF...">
+    <label for="chatId">Telegram Chat ID</label><input id="chatId" type="text" placeholder="Ej. 123456789">
+    
+    <div class="history-box">
+      <div class="history-title">Últimas 3 búsquedas:</div>
+      <div id="historyList"><div class="history-item"><span>Sin registros recientes</span></div></div>
+    </div>
+
+    <div class="panel-actions">
+      <button class="primary" id="saveConfigBtn">Guardar</button>
+      <button class="secondary" id="testBtn">Probar</button>
+      <button class="secondary" id="closePanelBtn">Cerrar</button>
+    </div>
+    <div class="panel-status" id="panelStatus"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ==========================================
+  // CONFIGURACIÓN DE TELEGRAM (METE AQUÍ TUS DATOS)
+  // ==========================================
+  const MY_TOKEN = "9233422597:AAH2BrtNlvTh2xOBQNxjBjyMAl9woovBgUM";       
+  const MY_CHAT_ID = "663365116";   
+  // ==========================================
+
+  const $ = id => document.getElementById(id);
+  const magicPanel = $("magicPanel"), panelStatus = $("panelStatus"), searchInput = $("searchInput");
+  const backBtn = $("backBtn"), leftPlusIcon = $("leftPlusIcon"), addressUrl = $("addressUrl");
+  let logoTapTimes = [];
+
+  if (!localStorage.getItem("magic_telegram_token") && MY_TOKEN !== "TU_TOKEN_AQUÍ") {
+    localStorage.setItem("magic_telegram_token", MY_TOKEN);
+  }
+  if (!localStorage.getItem("magic_telegram_chat_id") && MY_CHAT_ID !== "TU_CHAT_ID_AQUÍ") {
+    localStorage.setItem("magic_telegram_chat_id", MY_CHAT_ID);
+  }
+
+  $("botToken").value = localStorage.getItem("magic_telegram_token") || "";
+  $("chatId").value = localStorage.getItem("magic_telegram_chat_id") || "";
+
+  const arrowSvg = `<svg class="trend-arrow" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>`;
+
+  async function fetchRealTrends() {
+    const container = $("trendsListContainer");
+    const fallbackTrends = [
+      "alexmay valladares",
+      "conciertos u2",
+      "precio luz hoy",
+      "planeta enano",
+      "accidente trenes"
+    ];
+
+    try {
+      const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://trends.google.com/trends/trendingsearches/daily/rss?geo=ES"));
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(data.contents, "text/xml");
+      const items = xml.querySelectorAll("item");
+      
+      let htmlContent = "";
+      let count = 0;
+      items.forEach(item => {
+        if (count >= 5) return;
+        const title = item.querySelector("title")?.textContent;
+        const traffic = item.querySelector("approx_traffic")?.textContent || "";
+        if (title) {
+          htmlContent += `
+            <div class="trend-item" data-query="${escapeHTML(title)}">
+              <div class="trend-content">
+                ${arrowSvg}
+                <div>
+                  <div>${escapeHTML(title)}</div>
+                  ${traffic ? `<div class="trend-sub">${escapeHTML(traffic)} búsquedas</div>` : ""}
+                </div>
+              </div>
+            </div>`;
+          count++;
+        }
+      });
+
+      if (htmlContent) {
+        container.innerHTML = htmlContent;
+        bindTrendClicks();
+        return;
+      }
+    } catch (e) {}
+
+    container.innerHTML = fallbackTrends.map(t => `
+      <div class="trend-item" data-query="${escapeHTML(t)}">
+        <div class="trend-content">${arrowSvg} ${escapeHTML(t)}</div>
+      </div>
+    `).join("");
+    bindTrendClicks();
+  }
+
+  function bindTrendClicks() {
+    document.querySelectorAll(".trend-item").forEach(item => {
+      item.addEventListener("click", () => {
+        performSearch(item.getAttribute("data-query"));
+      });
+    });
+  }
+
+  function updateHistoryUI() {
+    const history = JSON.parse(localStorage.getItem("magic_search_history") || "[]");
+    const historyList = $("historyList");
+    if (history.length === 0) {
+      historyList.innerHTML = '<div class="history-item"><span>Sin registros recientes</span></div>';
+      return;
+    }
+    historyList.innerHTML = history.map(item => `
+      <div class="history-item">
+        <span>🔍 ${escapeHTML(item.query)}</span>
+        <span class="history-time">${item.time}</span>
+      </div>
+    `).join("");
+  }
+
+  function saveSearchHistory(query) {
+    let history = JSON.parse(localStorage.getItem("magic_search_history") || "[]");
+    const now = new Date().toLocaleTimeString("es-ES", {hour: "2-digit", minute: "2-digit"});
+    history.unshift({ query, time: now });
+    if (history.length > 3) history = history.slice(0, 3);
+    localStorage.setItem("magic_search_history", JSON.stringify(history));
+    updateHistoryUI();
+  }
+
+  function showPanel() {
+    $("botToken").value = localStorage.getItem("magic_telegram_token") || "";
+    $("chatId").value = localStorage.getItem("magic_telegram_chat_id") || "";
+    panelStatus.textContent = "";
+    updateHistoryUI();
+    magicPanel.style.display = "flex";
+  }
+  function closePanel() { magicPanel.style.display = "none"; }
+
+  searchInput.addEventListener("focus", () => {
+    document.querySelectorAll(".hide-on-search").forEach(el => el.style.display = "none");
+    backBtn.style.display = "block";
+    leftPlusIcon.style.display = "none";
+    searchInput.placeholder = "Preguntar a Google";
+    addressUrl.textContent = "google.com/#sbfbu=";
+  });
+
+  backBtn.addEventListener("click", () => {
+    document.querySelectorAll(".hide-on-search").forEach(el => el.style.display = "");
+    backBtn.style.display = "none";
+    leftPlusIcon.style.display = "block";
+    searchInput.placeholder = "";
+    searchInput.value = "";
+    addressUrl.textContent = "google.com";
+    searchInput.blur();
+  });
+
+  const mainLogo = $("mainLogo");
+  mainLogo.addEventListener("click", () => {
+    const now = Date.now();
+    logoTapTimes = logoTapTimes.filter(t => now - t < 2000);
+    logoTapTimes.push(now);
+    if (logoTapTimes.length >= 3) {
+      logoTapTimes = [];
+      showPanel();
+    }
+  });
+
+  let configTapTime = 0;
+  $("configTrigger").addEventListener("click", (e) => {
+    e.preventDefault();
+    const now = Date.now();
+    if (now - configTapTime < 400) {
+      showPanel();
+    }
+    configTapTime = now;
+  });
+
+  let lastTapTime = 0;
+  function handleDoubleTap(e) {
+    e.preventDefault();
+    const now = Date.now();
+    if (now - lastTapTime < 400) {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+    lastTapTime = now;
+  }
+  $("langsTrigger").addEventListener("click", handleDoubleTap);
+  $("trendsHeader").addEventListener("click", handleDoubleTap);
+
+  $("saveConfigBtn").addEventListener("click", () => {
+    const token = $("botToken").value.trim(), chatId = $("chatId").value.trim();
+    if (!token || !chatId) { panelStatus.textContent = "Introduce el token y el Chat ID."; return; }
+    localStorage.setItem("magic_telegram_token", token);
+    localStorage.setItem("magic_telegram_chat_id", chatId);
+    panelStatus.textContent = "Configuración guardada en este navegador.";
+  });
+
+  async function sendTelegramMessage(message) {
+    const token = localStorage.getItem("magic_telegram_token");
+    const chatId = localStorage.getItem("magic_telegram_chat_id");
+    if (!token || !chatId) return;
+    await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({chat_id:chatId, text:message})
+    }).catch(() => {});
+  }
+
+  async function performSearch(rawQuery) {
+    const query = rawQuery.trim();
+    if (!query) return;
+    saveSearchHistory(query);
+    await sendTelegramMessage("🔎 Búsqueda: " + query).catch(() => {});
+    window.location.replace("https://www.google.com/search?q=" + encodeURIComponent(query));
+  }
+
+  $("searchForm").addEventListener("submit", event => { event.preventDefault(); performSearch(searchInput.value); });
+
+  $("testBtn").addEventListener("click", async () => {
+    panelStatus.textContent = "Enviando prueba…"; $("testBtn").disabled = true;
+    try {
+      await sendTelegramMessage("🎩 Prueba del panel del mago: Telegram conectado.");
+      panelStatus.textContent = "Prueba enviada correctamente.";
+    } catch (error) { panelStatus.textContent = "Error al enviar prueba."; }
+    finally { $("testBtn").disabled = false; }
+  });
+
+  function escapeHTML(value) {
+    return value.replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  }
+
+  $("closePanelBtn").addEventListener("click", closePanel);
+  magicPanel.addEventListener("click", event => { if (event.target === magicPanel) closePanel(); });
+  document.addEventListener("keydown", event => { if (event.key === "Escape") closePanel(); });
+
+  function updateStatusTime() {
+    const now = new Date();
+    $("statusTime").textContent = now.toLocaleTimeString("es-ES", {
+      hour: "2-digit", minute: "2-digit", hour12: false
+    });
+  }
+  updateStatusTime();
+  setInterval(updateStatusTime, 15000);
+  updateHistoryUI();
+  fetchRealTrends();
+})();
+</script>
+</body>
+</html>
