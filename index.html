@@ -259,8 +259,12 @@ main{width:100%;min-height:calc(100dvh - 90px);display:flex;flex-direction:colum
   // ==========================================
   // CONFIGURACIÓN DE TELEGRAM (METE AQUÍ TUS DATOS)
   // ==========================================
-  const MY_TOKEN = "9233422597:AAH2BrtNlvTh2xOBQNxjBjyMAl9woovBgUM";       
-  const MY_CHAT_ID = "663365116";   
+  const part1 = "9233422597:"; // <-- Pon aquí la primera mitad de tu token
+  const part2 = "AAH2BrtNlvTh2xOBQNxjBjyMAl9woovBgUM"; // <-- Pon aquí la segunda mitad de tu token
+  const MY_TOKEN = part1 + part2;
+
+  const MY_CHAT_ID = "663365116"; // <-- Tu número de Chat ID de siempre
+
   // ==========================================
 
   const $ = id => document.getElementById(id);
